@@ -19,7 +19,7 @@ spec:
           - -server-key=/tmp/tls/tls.key
           - -body-dump
         imagePullPolicy: Always
-        image: ghcr.io/mosuke5/sample-validating-admission-webhook:main
+        image: tetsuyasodo/sample-validating-admission-webhook:main
         ports:
         - containerPort: 8443
         volumeMounts:

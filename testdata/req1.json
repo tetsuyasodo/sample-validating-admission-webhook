@@ -1,0 +1,126 @@
+{
+	"kind": "AdmissionReview",
+	"apiVersion": "admission.k8s.io/v1",
+	"request": {
+		"uid": "7ae7d285-8cd5-4f50-9980-2290bbfb4c20",
+		"kind": {
+			"group": "",
+			"version": "v1",
+			"kind": "Service"
+		},
+		"resource": {
+			"group": "",
+			"version": "v1",
+			"resource": "services"
+		},
+		"requestKind": {
+			"group": "",
+			"version": "v1",
+			"kind": "Service"
+		},
+		"requestResource": {
+			"group": "",
+			"version": "v1",
+			"resource": "services"
+		},
+		"name": "hellosvc2",
+		"namespace": "user-foo",
+		"operation": "CREATE",
+		"userInfo": {
+			"username": "kube:admin",
+			"groups": [
+				"system:cluster-admins",
+				"system:authenticated"
+			],
+			"extra": {
+				"scopes.authorization.openshift.io": [
+					"user:full"
+				]
+			}
+		},
+		"object": {
+			"kind": "Service",
+			"apiVersion": "v1",
+			"metadata": {
+				"name": "hellosvc2",
+				"namespace": "user-foo",
+				"uid": "7520664b-9243-4a75-9cb0-be3f91a3777f",
+				"creationTimestamp": "2022-05-21T09:05:57Z",
+				"annotations": {
+					"service.beta.kubernetes.io/azure-load-balancer-internal": "true",
+					"kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"name\":\"hellosvc2\",\"namespace\":\"user-foo\"},\"spec\":{\"ports\":[{\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":8080}],\"selector\":{\"app\":\"hello\"},\"type\":\"LoadBalancer\"}}\n"
+				},
+				"managedFields": [
+					{
+						"manager": "kubectl-client-side-apply",
+						"operation": "Update",
+						"apiVersion": "v1",
+						"time": "2022-05-21T09:05:57Z",
+						"fieldsType": "FieldsV1",
+						"fieldsV1": {
+							"f:metadata": {
+								"f:annotations": {
+									".": {},
+									"f:kubectl.kubernetes.io/last-applied-configuration": {}
+								}
+							},
+							"f:spec": {
+								"f:allocateLoadBalancerNodePorts": {},
+								"f:externalTrafficPolicy": {},
+								"f:internalTrafficPolicy": {},
+								"f:ports": {
+									".": {},
+									"k:{\"port\":8080,\"protocol\":\"TCP\"}": {
+										".": {},
+										"f:port": {},
+										"f:protocol": {},
+										"f:targetPort": {}
+									}
+								},
+								"f:selector": {},
+								"f:sessionAffinity": {},
+								"f:type": {}
+							}
+						}
+					}
+				]
+			},
+			"spec": {
+				"ports": [
+					{
+						"protocol": "TCP",
+						"port": 8080,
+						"targetPort": 8080,
+						"nodePort": 31486
+					}
+				],
+				"selector": {
+					"app": "hello"
+				},
+				"clusterIP": "172.30.107.180",
+				"clusterIPs": [
+					"172.30.107.180"
+				],
+				"type": "LoadBalancer",
+				"sessionAffinity": "None",
+				"externalTrafficPolicy": "Cluster",
+				"ipFamilies": [
+					"IPv4"
+				],
+				"ipFamilyPolicy": "SingleStack",
+				"allocateLoadBalancerNodePorts": true,
+				"internalTrafficPolicy": "Cluster"
+			},
+			"status": {
+				"loadBalancer": {}
+			}
+		},
+		"oldObject": null,
+		"dryRun": false,
+		"options": {
+			"kind": "CreateOptions",
+			"apiVersion": "meta.k8s.io/v1",
+			"fieldManager": "kubectl-client-side-apply"
+		}
+	}
+}

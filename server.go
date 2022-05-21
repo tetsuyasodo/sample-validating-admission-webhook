@@ -50,8 +50,7 @@ func main() {
 	}
 }
 
-// admin namespace => any runAsUser is ok
-// user namespace  => runAsUser other than root or empty is ok
+// if Kind == Service and includes annotation for creating Azure ILB then validation is OK
 func runAsUserValidation(c echo.Context) error {
 	req := new(admissionv1.AdmissionReview)
 	res := new(admissionv1.AdmissionReview)
@@ -61,38 +60,31 @@ func runAsUserValidation(c echo.Context) error {
 		panic(err)
 	}
 
-	// Fetch pod data
-	var pod corev1.Pod
-	if err := json.Unmarshal(req.Request.Object.Raw, &pod); err != nil {
-		panic(err)
-	}
-
-	if isAdminNamespace(req.Request.Namespace) {
-		res.Response.Allowed = true
-		return returnResponse(req, res, c)
-	}
-
-	if pod.Spec.SecurityContext.RunAsUser == nil {
-		res.Response.Allowed = false
-		res.Response.Result = &metav1.Status{
-			Code:    http.StatusForbidden,
-			Message: "runAsUser is required in user namespace.",
+    //fmt.Printf("%#v\n",req)
+	if req.Request.Kind.Kind == "Service" {
+		// Fetch service data
+		var service corev1.Service
+		if err := json.Unmarshal(req.Request.Object.Raw, &service); err != nil {
+			panic(err)
 		}
-		return returnResponse(req, res, c)
-	}
 
-	if isRootUser(pod.Spec.SecurityContext.RunAsUser) {
-		res.Response.Allowed = false
-		res.Response.Result = &metav1.Status{
-			Code:    http.StatusForbidden,
-			Message: "Can't set root for runAsUser in user namespace.",
+		ann := &service.ObjectMeta.Annotations
+		//fmt.Printf("%#v\n",ann)
+		if ann == nil || (*ann)["service.beta.kubernetes.io/azure-load-balancer-internal"] == "" || (*ann)["service.beta.kubernetes.io/azure-load-balancer-internal"] == "false" {
+			res.Response.Allowed = false
+			res.Response.Result = &metav1.Status{
+				Code:    http.StatusForbidden,
+				Message: "Annotation is required in user namespace.",
+			}
+			return returnResponse(req, res, c)
 		}
-		return returnResponse(req, res, c)
-
 	} else {
 		res.Response.Allowed = true
 		return returnResponse(req, res, c)
 	}
+
+	res.Response.Allowed = true
+	return returnResponse(req, res, c)
 }
 
 func isAdminNamespace(ns string) bool {

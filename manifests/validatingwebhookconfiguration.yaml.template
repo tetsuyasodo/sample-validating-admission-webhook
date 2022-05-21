@@ -14,7 +14,7 @@ webhooks:
   - apiGroups: [""]
     operations: ["CREATE"]
     apiVersions: ["v1"]
-    resources: ["pods"]
+    resources: ["services"]
     scope: "Namespaced"
   clientConfig:
     caBundle: BASE64_ENCODED_PEM_FILE

@@ -1,10 +1,12 @@
 [![application ci](https://github.com/mosuke5/sample-validation-admission-webhook/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/sample-validation-admission-webhook/actions/workflows/test.yaml)
 
 # Sample Validation Admission Webhook
-This repo is modified from original repo
+This repo is modified from [original repo](https://github.com/mosuke5/sample-validating-admission-webhook)
 
 https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
+
 https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/
+
 をもとに、user namespaceのserviceでILBのannotationがない場合、denyする仕組みを作る（ARO RA p.51の実装）
 
 ★は元repoのソースを改変したもの

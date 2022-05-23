@@ -7,7 +7,8 @@ This repo was modified based on [original repo](https://github.com/mosuke5/sampl
 - https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
 - https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/
 
-をもとに、user namespaceのserviceでILBのannotationがない場合、denyする仕組みを作る（ARO RA p.51の実装）
+## 何をするものか？
+AKS(Azure Kubernetes Servcie)やARO(Azure RedHat Openshift)の環境で、ロードバランサタイプのServiceオブジェクトを作る際に、以下のようにannotationsを記述することで内部LB(ILB)にルールを構成することができる仕様があります。
 
 ```
 apiVersion: v1
@@ -21,21 +22,24 @@ spec:
 ...
 ```
 
+このとき、annotationsの記述漏れがあるとパブリックLB(ELB)にinboundのアクセスエンドポイントができてしまうため、kubectl apply時にyamlをvalidate（検証）して、Service作成時に上記のILBのannotationがない場合、denyします
 
-★は元repoのソースを改変したもの
+## 動作確認手順
+★印はoriginal repoのソースを改変したものです
 
-### webhookサーバ(go)の実装
+### webhookサーバ(go)の実装★
 https://github.com/mosuke5/sample-validating-admission-webhook
-をcloneしてserver.goを改変★
+をcloneしてserver.goを改変しています。許可・拒否のロジックを変更したい場合はこのコードを変更してください。
 
-### 単体テストは以下のようにする
-testdata/req1.jsonはテスト用データ(ILB anno付)、req2はannoなし
+### 単体テストの実行
+testdata/req1.jsonはテスト用データ(ILB annotations付)、req2はannotationsなしテストデータです。
 ```
 $ go run server.go -server-cert=./tmp/server.crt -server-key=./tmp/server.key -body-dump
 $ curl -s -k -H 'Content-Type: application/json' -XPOST https://localhost:8443/runasuser-validation -d @testdata/req1.json | jq .
 ```
 
-### Dockerfileが含まれるのでbuildして自分のrepoにpushしておく(あとでdeploy.yamlで使う）
+### webhookサーバのコンテナビルド/push
+Dockerfileを用いてbuildして自分のrepoにpushしておく(あとでdeploy.yamlでこのイメージをデプロイします）
 ``` 
 $ docker login
 $ docker build -t tetsuyasodo/sample-validating-admission-webhook:main .
@@ -58,19 +62,22 @@ $ kubectl create ns mynamespace
 $ kubectl create secret tls mywebhook-secret --key server.key --cert server.crt -n mynamespace
 ```
 
-### webhookサーバイメージを持つPodをデプロイ(docker imageをpullしてくる)★
+### webhookサーバイメージを持つPodをデプロイ★
+docker imageをpullしています
 ```
 $ kubectl apply -f manifests/deploy.yaml -n mynamespace
 $ kubectl get pod,service -n mynamespace
 ```
 
-### validatingwebhookconfigurationをデプロイする(cluster-wide resource)
+### validatingwebhookconfigurationをデプロイする★
+cluster-wide resourceとして展開するとwebhookが有効化します
 ```
 $ sed  "s/BASE64_ENCODED_PEM_FILE/$(base64 -w 0 ./tmp/server.crt)/g" manifests/validatingwebhookconfiguration.yaml.template | kubectl apply -f -
 ```
 ※注意：元blogではbase64だけ使っているが改行があってsedが失敗するので"-w 0"で改行をしなくする必要がある
 
-### 動作確認
+### リソース展開時の動作確認
+svc1.yamlはannotationが含まれておりデプロイに成功しますが、svc2.yamlはannotationsがないため拒否されることが確認できます
 ```
 $ kubectl create ns user-foo
 $ kubectl apply -f svc1.yaml

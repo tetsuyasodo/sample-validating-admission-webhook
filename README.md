@@ -1,13 +1,26 @@
 [![application ci](https://github.com/mosuke5/sample-validation-admission-webhook/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/sample-validation-admission-webhook/actions/workflows/test.yaml)
 
 # Sample Validation Admission Webhook
-This repo is modified from [original repo](https://github.com/mosuke5/sample-validating-admission-webhook)
+This repo was modified based on [original repo](https://github.com/mosuke5/sample-validating-admission-webhook)
 
-https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
-
-https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/
+参考URL
+- https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
+- https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-2/
 
 をもとに、user namespaceのserviceでILBのannotationがない場合、denyする仕組みを作る（ARO RA p.51の実装）
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: hellosvc
+  namespace: sampleproj
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+...
+```
+
 
 ★は元repoのソースを改変したもの
 
